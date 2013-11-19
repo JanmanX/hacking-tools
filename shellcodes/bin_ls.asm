@@ -1,8 +1,5 @@
 ; Compile with NASM: "nasm filename"
 [BITS 32]
-section .text
-	global _start
-_start:
 	xor ecx, ecx		; set ecx to 0x0
 	push ecx		; push 0x0 onto the stack
 	push "n/ls"		; add "//bin/ls" to the stack
