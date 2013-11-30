@@ -1,6 +1,3 @@
-; 64 bit code!!!
-
-
 %define SYS_OPEN 0x05
 %define SYS_READ 0x03
 %define SYS_WRITE 0x04
