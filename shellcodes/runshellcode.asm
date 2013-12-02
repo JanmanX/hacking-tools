@@ -28,7 +28,7 @@ _start:
 	mov esi, DWORD [ebp+0xc] 	; get first "real" argument
 	
 	; OPEN
-	;int open(const char *pathname, int flags);
+	; int open(const char *pathname, int flags);
 	mov eax, 0x05
 	mov ebx, esi
 	mov ecx, O_RDONLY
@@ -45,10 +45,16 @@ _start:
 	mov edx, SHELLCODE_SIZE
 	int 0x80
 
+	; Save bytes read for later
+	push eax
+
 	; CLOSE FD
 	mov eax, 0x06
 	int 0x80
 
+	pop eax				;Get bytes read
+	call _print_shellcode
+	
 	; RUN SHELLCODE
 	jmp shellcode
 	
@@ -80,3 +86,29 @@ _generic_error:
 	mov edx, error_generic_len
 	int 0x80
 	call _exit
+
+_print_shellcode:
+	mov edx, eax			; Bytes read
+	inc edx
+	mov eax, SYS_WRITE
+	mov ebx, STDOUT
+	mov ecx, shellcode
+	int 0x80
+	
+	; Print new line
+	push ebp
+	mov ebp, esp
+	
+	push 0x00
+	push 0x0A 			; New Line
+	
+	mov eax, SYS_WRITE
+	mov ebx, STDOUT
+	mov ecx, esp
+	mov edx, 1
+	int 0x80
+	
+	
+	mov esp, ebp
+	pop ebp
+	ret	
