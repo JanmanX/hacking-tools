@@ -13,17 +13,17 @@ section .data
 	error_arg_msg_len equ $-error_arg_msg
 	
 section .bss
-	shellcode resb SHELLCODE_SIZE
+	shellcode resb SHELLCODE_SIZE	; Shellcode buffer
 
 section .text
 	global _start
 _start:
-	push ebp
-	mov ebp, esp
+	push ebp			; Create stack frame
+	mov ebp, esp			; ---
 	
 	mov eax, DWORD [ebp+0x4] 	; get number of arguments
-	cmp eax, 0x1
-	jle _print_error	
+	cmp eax, 0x1			
+	jle _print_error		; Print error message if only 1 argument given
 	
 	mov esi, DWORD [ebp+0xc] 	; get first "real" argument
 	
