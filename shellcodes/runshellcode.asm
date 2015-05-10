@@ -8,37 +8,38 @@
 
 section .data
 	error_generic db "Error occured", 0xA, 0x0
-	error_generic_len equ $-error_generic	
+	error_generic_len equ $-error_generic
 	error_arg_msg db "No argument given. Terminating",0xA, 0x0
 	error_arg_msg_len equ $-error_arg_msg
-	
+
 section .bss
 	shellcode resb SHELLCODE_SIZE	; Shellcode buffer
 
 section .text
 	global _start
 _start:
-	push ebp			; Create stack frame
-	mov ebp, esp			; ---
-	
-	mov eax, DWORD [ebp+0x4] 	; get number of arguments
-	cmp eax, 0x1			
-	jle _print_error		; Print error message if only 1 argument given
-	
-	mov esi, DWORD [ebp+0xc] 	; get first "real" argument
-	
+	push ebp						; Create stack frame
+	mov ebp, esp					; ---
+
+	mov eax, DWORD [ebp+0x4]		; get number of arguments
+	cmp eax, 0x1
+	jle _print_error				; Print error message if only 1 argument given
+
+	mov esi, DWORD [ebp+0xc]		; get first "real" argument
+
 	; OPEN
 	; int open(const char *pathname, int flags);
 	mov eax, 0x05
 	mov ebx, esi
 	mov ecx, O_RDONLY
 	int 0x80
-	
+
 	; error check
 	cmp eax, 0x0
-	jle _generic_error	
+	jle _generic_error
 
 	; READ
+	; ssize_t read(int fd, void* buf, size_t count)
 	mov ebx, eax
 	mov eax, SYS_READ
 	mov ecx, shellcode
@@ -54,21 +55,19 @@ _start:
 
 	pop eax				;Get bytes read
 	call _print_shellcode
-	
+
 	; RUN SHELLCODE
 	jmp shellcode
-	
-	
+
 	jmp _exit
 
 _exit:
 	mov esp, ebp
 	pop ebp
-	
+
 	mov eax, 0x1
 	mov ebx, 0x0
 	int 0x80
-
 
 
 _print_error:
@@ -94,21 +93,21 @@ _print_shellcode:
 	mov ebx, STDOUT
 	mov ecx, shellcode
 	int 0x80
-	
+
 	; Print new line
 	push ebp
 	mov ebp, esp
-	
+
 	push 0x00
 	push 0x0A 			; New Line
-	
+
 	mov eax, SYS_WRITE
 	mov ebx, STDOUT
 	mov ecx, esp
 	mov edx, 1
 	int 0x80
-	
-	
+
+
 	mov esp, ebp
 	pop ebp
-	ret	
+	ret
