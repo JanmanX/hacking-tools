@@ -4,7 +4,7 @@ F_ASM=-f elf
 LFLAGS=-m elf_i386
 
 
-all: runshellcode bin_sh bin_ls bind_shell
+all: runshellcode bin_sh bin_ls bind_shell connectback_sh
 
 
 runshellcode: runshellcode.asm
@@ -21,6 +21,8 @@ bin_ls:	bin_ls.asm
 bind_shell:	bind_shell.asm
 	$(ASM) bind_shell.asm -o bin/bind_shell
 
+connectback_sh: connectback_sh.asm
+	$(ASM) connectback_sh.asm -o bin/connectback_sh
 
 clean:
 	-rm -fv *.o bin/*
